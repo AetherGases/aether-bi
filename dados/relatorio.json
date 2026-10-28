@@ -1,0 +1,99 @@
+{
+  "batch_id": "d8996704-7a9b-4367-b4b5-91a2ec646f4e",
+  "by_year_status_type": [
+    {
+      "balance_tco2e": "129258.971000000000000000",
+      "emitted_tco2e": "134288.692000000000000000",
+      "enterprises": 3,
+      "inventories": 6,
+      "inventory_status": "APPROVED",
+      "inventory_type": "INPUT",
+      "inventory_year": 2022,
+      "period_end": "2022-12-31",
+      "period_start": "2022-01-01",
+      "reduced_tco2e": "5029.721000000000000000",
+      "reduction_rate_pct": "3.745454",
+      "units": 6
+    },
+    {
+      "balance_tco2e": "144513.979000000000000000",
+      "emitted_tco2e": "152956.905000000000000000",
+      "enterprises": 3,
+      "inventories": 6,
+      "inventory_status": "APPROVED",
+      "inventory_type": "INPUT",
+      "inventory_year": 2023,
+      "period_end": "2023-12-31",
+      "period_start": "2023-01-01",
+      "reduced_tco2e": "8442.926000000000000000",
+      "reduction_rate_pct": "5.519807",
+      "units": 6
+    },
+    {
+      "balance_tco2e": "123569.087000000000000000",
+      "emitted_tco2e": "131607.915000000000000000",
+      "enterprises": 3,
+      "inventories": 6,
+      "inventory_status": "APPROVED",
+      "inventory_type": "INPUT",
+      "inventory_year": 2024,
+      "period_end": "2024-12-31",
+      "period_start": "2024-01-01",
+      "reduced_tco2e": "8038.828000000000000000",
+      "reduction_rate_pct": "6.108165",
+      "units": 6
+    },
+    {
+      "balance_tco2e": "123382.501000000000000000",
+      "emitted_tco2e": "133605.091000000000000000",
+      "enterprises": 3,
+      "inventories": 6,
+      "inventory_status": "APPROVED",
+      "inventory_type": "INPUT",
+      "inventory_year": 2025,
+      "period_end": "2025-12-31",
+      "period_start": "2025-01-01",
+      "reduced_tco2e": "10222.590000000000000000",
+      "reduction_rate_pct": "7.651348",
+      "units": 6
+    }
+  ],
+  "decimal_encoding": "Decimals are strings to preserve precision",
+  "export_job_id": null,
+  "export_run_id": null,
+  "ingested_at_utc": "2026-10-28T11:07:52.959680Z",
+  "quality_from_emissions": {
+    "category_uninformed_count": 8,
+    "emission_count": 359,
+    "missing_enterprise_count": 0,
+    "missing_gas_count": 0,
+    "missing_scope_count": 0
+  },
+  "row_counts": {
+    "dim_org_hierarchy": 21,
+    "fato_emissoes": 359,
+    "fato_reducoes": 48,
+    "kpis_anuais": 12,
+    "kpis_inventario": 24,
+    "qualidade_dados": 24
+  },
+  "schema_version": 1,
+  "scope_note": "Soma dos inventarios disponiveis; nao e consolidacao corporativa auditada.",
+  "source": "workspace.gold",
+  "summary": {
+    "balance_tco2e": "520724.538000000000000000",
+    "emitted_tco2e": "552458.603000000000000000",
+    "enterprises": 3,
+    "inventories": 24,
+    "period_end": "2025-12-31",
+    "period_start": "2022-01-01",
+    "reduced_tco2e": "31734.065000000000000000",
+    "reduction_rate_pct": "5.744153",
+    "units": 6
+  },
+  "validation": {
+    "absolute_tolerance_tco2e": "0.000001",
+    "inventory_reconciliation": "passed",
+    "note": "Nao valida todas as saidas Gold nem comprova origem operacional."
+  }
+}
