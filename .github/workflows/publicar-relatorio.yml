@@ -1,0 +1,106 @@
+  name: Publicar relatorio Aether
+
+on:
+  workflow_run:
+    workflows: [Dados Aether atualizados]
+    branches: [dados]
+    types: [completed]
+  push:
+    branches: [main]
+    paths:
+      - scripts/build_relatorio_gerencial.py
+      - .github/workflows/publicar-relatorio.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: aether-pages
+  cancel-in-progress: false
+
+jobs:
+  gerar:
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      (github.event_name != 'workflow_run' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_repository.full_name == github.repository))
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Buscar codigo da main
+        uses: actions/checkout@v6
+        with:
+          ref: main
+          path: codigo
+          persist-credentials: false
+
+      - name: Buscar JSON mais recente da dados
+        uses: actions/checkout@v6
+        with:
+          ref: dados
+          path: entrada
+          sparse-checkout: dados/relatorio.json
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+
+      - name: Preparar Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Validar dados e gerar HTML
+        run: >-
+          python codigo/scripts/build_relatorio_gerencial.py
+          --data entrada/dados/relatorio.json
+          --output public/index.html
+
+      - name: Registrar versoes utilizadas
+        shell: python
+        run: |
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          import subprocess
+
+          data_path = Path('entrada/dados/relatorio.json')
+          raw = data_path.read_bytes()
+          data = json.loads(raw)
+          code_sha = subprocess.check_output(
+              ['git', '-C', 'codigo', 'rev-parse', 'HEAD'], text=True
+          ).strip()
+          data_sha = subprocess.check_output(
+              ['git', '-C', 'entrada', 'rev-parse', 'HEAD'], text=True
+          ).strip()
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as summary:
+              summary.write('Relatorio gerado com sucesso.\n\n')
+              summary.write(f"Carga: {data['batch_id']}\n\n")
+              summary.write(f"Extracao UTC: {data['ingested_at_utc']}\n\n")
+              summary.write(f"Commit do codigo: {code_sha}\n\n")
+              summary.write(f"Commit dos dados: {data_sha}\n\n")
+              summary.write(f"SHA-256 do JSON: {hashlib.sha256(raw).hexdigest()}\n")
+
+      - name: Enviar HTML para publicacao
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: public
+
+  publicar:
+    needs: gerar
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Preparar Pages
+        uses: actions/configure-pages@v5
+
+      - name: Publicar relatorio
+        id: deployment
+        uses: actions/deploy-pages@v4
