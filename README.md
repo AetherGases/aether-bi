@@ -1,41 +1,35 @@
 # Aether BI
 
-Repositório de Business Intelligence do ecossistema **Aether**, voltado à análise de inventários de gases de efeito estufa (GEE). Reúne os notebooks de processamento, as consultas SQL, os indicadores e o relatório gerencial do projeto.
+Relatório gerencial de emissões e reduções, gerado a partir dos dados da Gold do Databricks.
 
-O objetivo é transformar os registros da aplicação em informações sobre emissões, reduções e qualidade dos dados, permitindo análises por empresa, unidade, departamento e período.
+## Arquivos
 
-## Fluxo dos dados
+- `dados/relatorio.json`: dados atualizados pelo exportador do Databricks.
+- `scripts/build_relatorio_gerencial.py`: lê o JSON, confere os valores e monta o relatório. Os estilos já estão dentro dele.
+- `outputs/relatorio_gerencial/relatorio-gerencial-aether.html`: relatório pronto para abrir no navegador.
 
-```text
-PostgreSQL / Aiven → Views do data mart → Bronze → Silver → Gold → Dashboard
+O README explica o uso, LICENSE contém a licença e .gitignore evita incluir arquivos temporários no Git.
+
+## Gerar o relatório
+
+Requisito: Python 3.10 ou superior. Não precisa instalar bibliotecas.
+
+Na raiz do repositório:
+
+```shell
+python scripts/build_relatorio_gerencial.py
 ```
 
-O processamento acontece no Databricks, seguindo a arquitetura medalhão:
+Depois abra `outputs/relatorio_gerencial/relatorio-gerencial-aether.html` no navegador.
+Para salvar em PDF, use o botão de impressão: papel A4, escala 100% e cabeçalhos/rodapés do navegador desativados.
 
-- **Bronze:** extrai as views do data mart e registra a origem e a identificação da carga.
-- **Silver:** padroniza os dados e valida chaves, períodos, quantidades e relacionamentos.
-- **Gold:** concilia os totais e prepara as tabelas e os indicadores para consumo.
+## Como funciona
 
-As três etapas são executadas em sequência pelo Job **Aether — Pipeline**, com agendamento diário.
+O JSON contém os números; o Python gera cards, tabelas e gráficos; o HTML mostra o resultado.
+O relatório exibe a carga, a data da extração em UTC e o hash do JSON utilizado.
+Se os dados estiverem inválidos ou os totais não fecharem, a geração é interrompida e o HTML anterior é preservado.
+Empresas e unidades são contadas distintamente no período, sem somar as contagens anuais.
 
-## Análises e indicadores
+Quando o JSON mudar, execute o comando novamente. A geração e publicação automáticas pelo GitHub Actions serão configuradas na próxima etapa.
 
-O BI acompanha emissões e reduções em **tCO₂e**, saldo após reduções, taxa de redução e cobertura dos inventários. Também permite explorar a distribuição por escopo, categoria e gás, além de identificar informações incompletas.
-
-Os resultados alimentam o dashboard no Databricks e o relatório gerencial em HTML, preparado para exportação em PDF. A massa de demonstração disponível no repositório é fictícia e destinada ao desenvolvimento e à validação do projeto.
-
-## Organização
-
-| Pasta | Conteúdo |
-|---|---|
-| `database/` | Views do data mart e scripts SQL de apoio |
-| `notebooks/` | Etapas Bronze, Silver e Gold do Databricks |
-| `docs/` | Arquitetura, regras dos indicadores e documentação da entrega |
-| `scripts/` | Geração, exportação e validações locais |
-| `outputs/` | Arquivos do dashboard, dados exportados e relatório gerencial |
-
-## Atualização do relatório
-
-A próxima etapa é integrar a publicação dos resultados ao Job: após o sucesso da Gold, uma tarefa exportará os indicadores para este repositório, e um workflow do GitHub Actions gerará o HTML atualizado.
-
-O relatório atual é estático; essa integração ainda está em implementação. Credenciais e tokens de acesso devem permanecer fora do repositório.
+Credenciais e tokens não devem ser incluídos no repositório.
