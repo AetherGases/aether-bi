@@ -353,7 +353,7 @@ def build(data_path, output_path):
     temporary = None
     try:
         with tempfile.NamedTemporaryFile(mode='w', encoding='utf-8', dir=output_path.parent,
-                                         prefix='.relatorio-', suffix='.tmp', delete=False) as handle:
+                                        prefix='.relatorio-', suffix='.tmp', delete=False) as handle:
             temporary = Path(handle.name)
             handle.write(document)
         os.replace(temporary, output_path)
