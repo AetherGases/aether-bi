@@ -1,4 +1,4 @@
-  name: Publicar relatorio Aether
+name: Publicar relatorio Aether
 
 on:
   workflow_run:
