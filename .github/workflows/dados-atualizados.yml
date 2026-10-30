@@ -1,0 +1,18 @@
+name: Dados Aether atualizados
+
+on:
+  push:
+    branches: [dados]
+    paths:
+      - dados/relatorio.json
+      - .github/workflows/dados-atualizados.yml
+
+permissions: {}
+
+jobs:
+  avisar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Sinalizar atualizacao
+        run: echo "Nova versao dos dados recebida."
