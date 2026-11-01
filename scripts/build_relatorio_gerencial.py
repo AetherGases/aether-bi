@@ -44,6 +44,11 @@ def text(value, label):
         raise ValueError(f'Texto obrigatorio ausente: {label}')
     return value
 
+def inventory_attribute(value, label):
+    if value is None or (isinstance(value, str) and not value.strip()):
+        return 'Não informado'
+    return text(value, label)
+
 
 def close(actual, expected, label):
     if abs(actual - expected) > TOLERANCE:
@@ -136,9 +141,9 @@ def load_report(path):
     inventory_count = 0
     for row in groups:
         year = count(row['inventory_year'])
-        status = text(row['inventory_status'], 'inventory_status')
-        kind = text(row['inventory_type'], 'inventory_type')
-        key = (year, status, kind)
+        status = inventory_attribute(row['inventory_status'], 'inventory_status')
+        kind = inventory_attribute(row['inventory_type'], 'inventory_type')
+        key = (year, row['inventory_status'], row['inventory_type'])
         if key in keys:
             raise ValueError(f'Grupo anual duplicado: {key!r}')
         keys.add(key)
