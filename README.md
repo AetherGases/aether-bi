@@ -1,6 +1,19 @@
 # Aether BI
 
-Relatório gerencial de emissões e reduções, gerado com os dados da Gold do Databricks.
+Business Intelligence do [Aether](https://github.com/AetherGases): um pipeline em **Databricks** (camadas Bronze, Silver e Gold) calcula os indicadores de emissões e reduções, e este repositório transforma o resultado em um **relatório gerencial HTML** publicado automaticamente no GitHub Pages.
+
+## Visão geral
+
+```mermaid
+flowchart LR
+  DBX["Databricks<br/>Bronze → Silver → Gold"] -->|Job exporta JSON| DADOS["branch dados<br/>dados/relatorio.json"]
+  DADOS -->|workflow_run| PUB["Workflow Publicar relatorio Aether<br/>(branch main)"]
+  PUB --> GEN["scripts/build_relatorio_gerencial.py<br/>valida o JSON e gera o HTML"]
+  GEN --> PAGES["GitHub Pages"]
+```
+
+- O pipeline do Databricks e o exportador ficam fora deste repositório. Aqui vivem apenas o gerador e a publicação.
+- O gerador é um único script Python **sem dependências externas** (somente biblioteca padrão). O HTML gerado é autocontido, com os estilos embutidos.
 
 ## Organização
 
