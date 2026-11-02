@@ -1,5 +1,5 @@
 {
-  "batch_id": "d6355b2e-b4ea-46e0-acb2-955a9d3030fd",
+  "batch_id": "e26426d6-b78b-41e4-97ac-d945cf5715e1",
   "by_year_status_type": [
     {
       "balance_tco2e": "0.000000000000000000",
@@ -508,8 +508,8 @@
   ],
   "decimal_encoding": "Decimals are strings to preserve precision",
   "export_job_id": "790870084097436",
-  "export_run_id": "1100432961915697",
-  "ingested_at_utc": "2026-11-02T22:01:31.199899Z",
+  "export_run_id": "597107142945050",
+  "ingested_at_utc": "2026-11-02T22:54:24.041450Z",
   "quality_from_emissions": {
     "category_uninformed_count": 8,
     "emission_count": 507,
