@@ -246,17 +246,17 @@ def render_report(report):
                 'Todos os grupos exportados são incluídos. Empresas e unidades são contagens distintas no período completo.') + provenance)
 
     page('1 · APRESENTAÇÃO DA BASE', 'Da estrutura organizacional<br>ao inventário',
-         '<div class="flow vertical"><span>Aplicação Aether</span><b>↓</b><span>PostgreSQL / Aiven · data mart</span><b>↓</b><span>Bronze → Silver → Gold → Relatório</span></div>'
+         '<div class="flow vertical"><span>Aplicação Aether</span><b>↓</b><span>PostgreSQL / Neon · data mart</span><b>↓</b><span>Bronze → Silver → Gold → Dashboard e relatório</span></div>'
          + table(['View de entrada', 'Grão e finalidade'], [
              ('vw_dim_org_hierarchy', 'node_type + node_id: hierarquia organizacional.'),
              ('vw_fact_emission', 'emission_id: emissões por inventário e dimensões.'),
              ('vw_fact_reduction', 'reduction_id: reduções por inventário e categoria.'),
              ('vw_analytics_org_period', 'inventory_id: indicadores por inventário.')], 'Contratos descritos na documentação local.')
          + note('Recorte temporal', 'inventory_year representa o ano inicial do inventário. Períodos que atravessam anos não são rateados por este relatório.')
-         + note('Proveniência', 'O JSON identifica a fonte e a carga exportada, mas não comprova a natureza operacional ou demonstrativa dos registros. A existência de massa fictícia local não determina a origem desta carga.'))
+         + note('Conectividade e origem', 'A conexão db2aether2year acessa o PostgreSQL no Neon. O catálogo db2aether2year_catalog expõe as views do schema public do banco dbAether2Year, lidas pela Bronze. O JSON identifica a carga; a natureza demonstrativa ou operacional dos registros deve ser confirmada na origem.'))
 
     page('2 · PROBLEMA E INDICADORES', 'Como interpretar as métricas',
-         '<p>As métricas relacionam emissões e reduções com o período e a cobertura dos inventários disponíveis.</p>'
+         '<p>A análise busca identificar as principais fontes emissoras, comparar organizações e períodos e acompanhar o saldo após as reduções. Os indicadores apoiam a priorização de ações e a revisão de lacunas nos dados.</p>'
          + table(['Indicador', 'Regra e interpretação'], [
              ('Emissões', 'Soma das emissões registradas, em tCO₂e.'),
              ('Reduções', 'Soma das reduções registradas, em tCO₂e.'),
@@ -273,7 +273,8 @@ def render_report(report):
              ('Gold', 'Conciliação dos fatos e dos indicadores por inventário.'),
              ('Exportação', 'Consistência de carga, chaves, quantidades e conciliação dos KPIs com os fatos.'),
              ('Gerador HTML', 'Contrato, números finitos, períodos, grupos duplicados, contagens, taxas e totais anuais versus resumo global.')])
-         + note('Alcance das evidências', 'A descrição do código local não comprova a versão implantada. O JSON informa conciliação aprovada na exportação; não contém logs de correções da Silver nem todos os testes da Gold.'))
+         + note('Proteções de qualidade', 'A Bronze bloqueia a gravação quando hierarquia ou indicadores de inventário estão vazios. A Silver separa em quarentena inventários com período ausente nos fatos e na view analítica, confirmados como REJECTED em todos os fatos disponíveis. Seus fatos e indicadores ficam fora do consumo; os dados permanecem na Bronze. Demais períodos inválidos bloqueiam a carga.')
+         + note('Apresentação e evidências', 'Status e tipo nulos ou vazios aparecem como Não informado no relatório. O JSON registra conciliação aprovada; a versão dos notebooks, a quarentena e os logs devem ser conferidos no Job.'))
 
     for offset in range(0, len(years), 4):
         subset = years[offset:offset + 4]
@@ -304,23 +305,26 @@ def render_report(report):
 
     page('6 · PIPELINE E AUTOMAÇÃO', 'Rastreabilidade da carga',
          '<div class="flow"><span>Bronze</span><i>→</i><span>Silver</span><i>→</i><span>Gold</span><i>→</i><span>Exportação</span></div>'
+         '<p>O Job Aether — Pipeline executa os notebooks em tarefas dependentes: cada etapa começa após o sucesso da anterior, sem execução manual de células. O disparo pode ocorrer pelo agendamento configurado ou manualmente. A Gold grava as tabelas Delta de consumo em workspace.gold e calcula a taxa de redução sobre os totais conciliados.</p>'
+         '<p>A tarefa de exportação envia os indicadores para dados/relatorio.json na branch dados do GitHub. O GitHub Actions busca o JSON e o gerador da main, valida os dados, gera o HTML e publica o relatório no GitHub Pages. O dashboard consulta as tabelas Gold; o relatório utiliza os agregados exportados.</p>'
          + table(['Metadado', 'Valor informado'], [
              ('Fonte', data['source']), ('Carga', data['batch_id']),
              ('Extração', extracted.strftime('%d/%m/%Y %H:%M:%S UTC')),
              ('Job de exportação', data['export_job_id'] or 'Não informado'),
              ('Execução de exportação', data['export_run_id'] or 'Não informada')])
-         + note('Como conferir uma atualização', 'Compare a carga e a extração com o JSON no GitHub. O SHA-256 identifica os bytes exatos utilizados. Uma nova carga pode manter os indicadores iguais quando os dados de negócio não mudam.')
-         + note('Limites dos metadados', 'O JSON não contém duração das tarefas, histórico de agendamento ou confirmação da publicação do HTML. Os IDs permitem localizar a execução no Databricks.') + provenance)
+         + note('Evidências da execução', 'Os links e capturas da entrega permitem conferir as dependências, o histórico, o status e a duração das tarefas no Databricks. Os resultados são as tabelas Gold e o JSON exportado; a geração e a publicação são conferidas no GitHub Actions. Esses logs não estão incorporados ao JSON. Compare carga, extração e SHA-256 para identificar o arquivo utilizado.') + provenance)
 
     page('7 · DASHBOARD E CAMADA DE CONSUMO', 'Cada pergunta, uma leitura',
-         table(['Área de análise', 'Fonte prevista na arquitetura'], [
+         '<p>O dashboard organiza os dados da aplicação para comparação e acompanhamento dos inventários. Seus datasets consultam diretamente workspace.gold; por exemplo, o dataset de emissões utiliza FROM workspace.gold.fato_emissoes.</p>'
+         + table(['Área de análise', 'Base final e visualizações'], [
              ('Visão geral', 'kpis_inventario: totais, cobertura e evolução.'),
              ('Escopos, categorias e gases', 'fato_emissoes: distribuição das emissões.'),
              ('Empresas e unidades', 'Dimensões organizacionais relacionadas aos fatos.'),
              ('Reduções', 'fato_reducoes: quantidades e categorias.'),
-             ('Qualidade', 'Ocorrências de preenchimento nas saídas analíticas.')], 'Referências da documentação e dos artefatos locais.')
+             ('Qualidade', 'Ocorrências de preenchimento nas saídas analíticas.')], 'Tabelas de consumo produzidas pelo notebook Gold.')
+         + note('Visualizações implementadas', 'Barras e linhas mostram comparações e evolução; cards apresentam KPIs e desvios quando há comparação válida. Histogramas e boxplots mostram distribuições. O mapa apresenta a localização associada às unidades; ela não identifica necessariamente o local físico de cada emissão.')
          + note('Filtros e comparação', 'Ao comparar com o dashboard, use os mesmos períodos, status e tipos. Este HTML inclui todos os grupos do JSON e não possui filtros interativos.')
-         + note('Verificação visual', 'O JSON agregado não comprova a configuração ou o funcionamento dos filtros do dashboard. Escopo de emissão não deve ser aplicado às reduções sem uma relação definida no modelo.'))
+         + note('Interação e verificação', 'Os filtros permitem explorar período, empresa, unidade e departamento, além dos recortes específicos disponíveis. Escopo de emissão não deve filtrar reduções. O link e as capturas do dashboard permitem conferir as visualizações; o JSON agregado não comprova seu funcionamento.'))
 
     page('8 · CONCLUSÕES E REFERÊNCIAS', 'Resultados com<br>rastreabilidade',
          f'<p>A carga contém <b>{coverage["inventories"]} inventários</b>, <b>{coverage["enterprises"]} empresas</b> e <b>{coverage["units"]} unidades</b>, de <b>{start:%d/%m/%Y}</b> a <b>{end:%d/%m/%Y}</b>.</p>'
