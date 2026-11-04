@@ -1,5 +1,5 @@
 {
-  "batch_id": "c2435eb1-667f-4517-bdf6-20f0184facc4",
+  "batch_id": "86114468-2844-4fbf-8994-94b463dfb1e5",
   "by_year_status_type": [
     {
       "balance_tco2e": "55865.179000000000000000",
@@ -420,39 +420,53 @@
       "reduced_tco2e": "6815.574000000000000000",
       "reduction_rate_pct": "14.651606",
       "units": 3
+    },
+    {
+      "balance_tco2e": "98.797000000000000000",
+      "emitted_tco2e": "98.797000000000000000",
+      "enterprises": 1,
+      "inventories": 1,
+      "inventory_status": "APPROVED",
+      "inventory_type": "INPUT",
+      "inventory_year": 2026,
+      "period_end": "2026-12-31",
+      "period_start": "2026-01-01",
+      "reduced_tco2e": "0.000000000000000000",
+      "reduction_rate_pct": "0.000000",
+      "units": 1
     }
   ],
   "decimal_encoding": "Decimals are strings to preserve precision",
   "export_job_id": "790870084097436",
-  "export_run_id": "915606564626642",
-  "ingested_at_utc": "2026-11-04T16:16:20.692325Z",
+  "export_run_id": "1072492472202726",
+  "ingested_at_utc": "2026-11-04T22:01:40.253834Z",
   "quality_from_emissions": {
     "category_uninformed_count": 0,
-    "emission_count": 11523,
+    "emission_count": 11531,
     "missing_enterprise_count": 0,
     "missing_gas_count": 0,
     "missing_scope_count": 0
   },
   "row_counts": {
     "dim_org_hierarchy": 1504,
-    "fato_emissoes": 11523,
+    "fato_emissoes": 11531,
     "fato_reducoes": 525,
-    "kpis_anuais": 98,
-    "kpis_inventario": 501,
-    "qualidade_dados": 501
+    "kpis_anuais": 99,
+    "kpis_inventario": 502,
+    "qualidade_dados": 502
   },
   "schema_version": 1,
   "scope_note": "Soma dos inventarios disponiveis; nao e consolidacao corporativa auditada.",
   "source": "workspace.gold",
   "summary": {
-    "balance_tco2e": "1652221.214000000000000000",
-    "emitted_tco2e": "1875000.000000000000000000",
+    "balance_tco2e": "1652320.011000000000000000",
+    "emitted_tco2e": "1875098.797000000000000000",
     "enterprises": 15,
-    "inventories": 501,
-    "period_end": "2025-12-31",
+    "inventories": 502,
+    "period_end": "2026-12-31",
     "period_start": "2020-01-01",
     "reduced_tco2e": "222778.786000000000000000",
-    "reduction_rate_pct": "11.881535",
+    "reduction_rate_pct": "11.880909",
     "units": 18
   },
   "validation": {
